@@ -1,0 +1,120 @@
+<!--
+(C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
+
+icensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Contributors:
+  Gabriel Barata <gbarata@nuxeo.com>
+-->
+<link rel="import" href="nuxeo-liveconnect-behavior.html">
+<script type="text/javascript" src="https://js.live.net/v7.2/OneDrive.debug.js"></script>
+<!--
+`nuxeo-liveconnect-onedrive-provider`
+@group Nuxeo UI
+@element nuxeo-liveconnect-onedrive-provider
+-->
+<dom-module id="nuxeo-liveconnect-onedrive-graph-provider">
+
+  <template>
+    <style>
+      :host {
+        display: none;
+      }
+    </style>
+    <nuxeo-resource id="oauth2"></nuxeo-resource>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'nuxeo-liveconnect-onedrive-graph-provider',
+
+        behaviors: [Nuxeo.LiveConnectBehavior],
+
+        properties: {
+          providerId: {
+            value: 'msgraph'
+          }
+        },
+
+        openPicker: function() {
+          this.updateProviderInfo().then(function() {
+            if (this.isUserAuthorized) {
+              return this.getToken().then(function(response) {
+                this.accessToken = response.token;
+                this._handleAuthResult(response.token);
+              }.bind(this));
+            } else {
+              this.openPopup(this.authorizationURL, {
+                onMessageReceive: this._parseMessage.bind(this),
+                onClose: this._onOAuthPopupClose.bind(this)
+              });
+            }
+          }.bind(this));
+        },
+
+        _parseMessage: function(event) {
+          var data = JSON.parse(event.data);
+          this.accessToken = data.token;
+        },
+
+        _onOAuthPopupClose: function() {
+          if (this.accessToken) {
+            if (!this.userId) {
+              this.updateProviderInfo().then(function() {
+                if (!this.userId) {
+                  throw 'No username available.';
+                }
+                this._handleAuthResult(this.accessToken);
+              }.bind(this));
+            } else {
+              this._handleAuthResult(this.accessToken);
+            }
+          }
+        },
+
+        _handleAuthResult: function (token) {
+          var context = this;
+          var options = {
+            clientId: this.clientId,
+            action: "download",
+            success: function (files) {
+              console.log(files);
+              let blobs = files.value.map(file => {
+                return {
+                  providerId: context.providerId,
+                  providerName: 'OneDrive',
+                  user: context.userId,
+                  fileId: file.id,
+                  name: file.name,
+                  size: file.size,
+                  key: context.generateBlobKey(file.id)
+                }
+              })
+              context.notifyBlobPick(blobs);
+            },
+            advanced: {
+              accessToken: token,
+              redirectUri: window.location.origin+window.location.pathname+"nuxeo-liveconnect/nuxeo-liveconnect-onedrive-picker.html",
+              loginHint: "https://graph.microsoft.com/v1.0/"
+            }
+          };
+          OneDrive.open(options);
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

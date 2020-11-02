@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.ecm.liveconnect.msgraph.core.OneDriveComponent" version="1.0.0">
+
+  <require>org.nuxeo.ecm.core.blob.BlobManager</require>
+  <require>org.nuxeo.ecm.platform.oauth2.providers.OAuth2ServiceProviderRegistry</require>
+
+  <documentation>
+    Management of OneDrive configuration.
+  </documentation>
+
+  <extension target="org.nuxeo.ecm.platform.oauth2.providers.OAuth2ServiceProviderRegistry" point="providers">
+    <provider>
+      <name>msgraph</name>
+      <description>OneDrive</description>
+      <class>org.nuxeo.ecm.liveconnect.msgraph.MSGraphOAuth2ServiceProvider</class>
+      <tokenServerURL>https://login.microsoftonline.com/common/oauth2/v2.0/token</tokenServerURL>
+      <authorizationServerURL>https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code</authorizationServerURL>
+      <scope>https://graph.microsoft.com/User.Read</scope>
+      <scope>https://graph.microsoft.com/Files.ReadWrite.All</scope>
+      <scope>offline_access</scope>
+    </provider>
+  </extension>
+
+  <extension target="org.nuxeo.ecm.core.blob.BlobManager" point="configuration">
+    <blobprovider name="msgraph">
+      <class>org.nuxeo.ecm.liveconnect.msgraph.MSGraphBlobProvider</class>
+    </blobprovider>
+  </extension>
+
+</component>
