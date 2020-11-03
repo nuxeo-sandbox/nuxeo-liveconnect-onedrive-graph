@@ -1,10 +1,10 @@
 <!-- See documentation at http://doc.nuxeo.com/x/HgIz -->
 <package type="addon" name="nuxeo-liveconnect-onedrive-graph" version="@VERSION@">
-  <title>Nuxeo liveconnect onedrive graph</title>
+  <title>Nuxeo Liveconnect Onedrive Graph</title>
   <description>
-    <p>Put here an HTML description of your Nuxeo Package.</p>
+    <p>A nuxeo liveconnect plugin for the Microsoft Graph API (OneDrive, OneDrive for Business, and SharePoint document libraries) using Microsoft's Java SDK</p>
   </description>
-  <!-- <home-page>http://doc.nuxeo.com/</home-page> -->
+  <home-page>https://github.com/nuxeo-sandbox/nuxeo-liveconnect-onedrive-graph</home-page>
   <vendor>Nuxeo</vendor>
   <installer restart="true" />
   <uninstaller restart="true" />
@@ -38,5 +38,5 @@
   <license></license>
   <license-url></license-url>
   <!-- Visibility: PRIVATE | MARKETPLACE | DEV | PUBLIC -->
-  <visibility>DEV</visibility>
+  <visibility>PUBLIC</visibility>
 </package>
