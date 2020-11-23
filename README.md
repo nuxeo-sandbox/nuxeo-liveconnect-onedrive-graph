@@ -12,19 +12,19 @@ mvn clean install
 ## Azure Configuration
 
 * Log into the [azure portal](https://portal.azure.com/#home) with your microsoft account
-* Click on App registrations 
+* Click on App registrations
 * Click on Register a new application
     * Set a name
-    * Choose "Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)" 
+    * Choose "Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)"
     * Set the redirect URI to http(s)://MY_SERVER/nuxeo/site/oauth2/msgraph/callback
     * Click on Create
 * In the Authentication menu
     * Add a second redirect URI http(s)://MY_SERVER/nuxeo/ui/nuxeo-liveconnect/nuxeo-liveconnect-onedrive-picker.html
     * Check Access tokens and ID tokens in Implicit grant
 * In the Certificates & secrets menu, create a secret and copy the value
-* In the API permissions, add permissions (Microsoft Graph / Delegated permissions) 
-    * offline_access 
-    * Files.ReadWrite.All 
+* In the API permissions, add permissions (Microsoft Graph / Delegated permissions)
+    * offline_access
+    * Files.ReadWrite.All
 
 ## Nuxeo Configuration
 * log into Nuxeo as an administrator
