@@ -1,42 +1,53 @@
-## Description
+# Description
 
-This repository contains a nuxeo liveconnect plugin for the [Microsoft Graph API](https://developer.microsoft.com/en-us/graph) using [Microsoft's Java SDK](https://github.com/microsoftgraph/msgraph-sdk-java)
+This repository contains a Nuxeo Live Connect plugin for the [Microsoft Graph API](https://developer.microsoft.com/en-us/graph) using [Microsoft's Java SDK](https://github.com/microsoftgraph/msgraph-sdk-java). This restores the ability to use Nuxeo Live Connect with OneDrive.
 
-## How to build
+# How to build
+
 ```
 git clone https://github.com/nuxeo-sandbox/nuxeo-liveconnect-onedrive-graph
 cd nuxeo-liveconnect-onedrive-graph
 mvn clean install
 ```
 
-## Azure Configuration
+# Azure Configuration
 
-* Log into the [azure portal](https://portal.azure.com/#home) with your microsoft account
-* Click on App registrations
-* Click on Register a new application
-    * Set a name
-    * Choose "Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)"
-    * Set the redirect URI to http(s)://MY_SERVER/nuxeo/site/oauth2/msgraph/callback
-    * Click on Create
-* In the Authentication menu
-    * Add a second redirect URI http(s)://MY_SERVER/nuxeo/ui/nuxeo-liveconnect/nuxeo-liveconnect-onedrive-picker.html
-    * Check Access tokens and ID tokens in Implicit grant
-* In the Certificates & secrets menu, create a secret and copy the value
-* In the API permissions, add permissions (Microsoft Graph / Delegated permissions)
-    * offline_access
-    * Files.ReadWrite.All
+* Log into the [Azure portal](https://portal.azure.com/#home) with your Microsoft account
+* Use the search bar to locate the "App registrations" service
+* Click **New registration**
+    * Set a value for **Name**; this is the display name shown in the OAuth dialog so choose something meaningful
+    * For **Supported account types** choose `Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)`
+    * Set the **Redirect URI** to `https://<your_SERVER>/nuxeo/site/oauth2/msgraph/callback`
+    * Click on **Register**
+    * Make note of the **Application (client) ID**; this will be used in Nuxeo later
+* Open the **Authentication** menu
+    * Add a second redirect URI `https://<your_SERVER>/nuxeo/ui/nuxeo-liveconnect/nuxeo-liveconnect-onedrive-picker.html`
+    * Check `Access tokens` and `ID tokens` under **Implicit grant**
+* Open the **Certificates & secrets** menu
+  * Create a **New client secret**
+  * Copy the **Value**; this will be used in Nuxeo later
+  * Note: do *not* copy the **ID**, this is just the UUID of the secret record
+* Open the **API permissions** menu
+  * Click on **Add permission**
+    * Choose `Microsoft Graph`
+    * Choose `Delegated permissions`
+    * Enable `OpenId permissions > offline_access`
+    * Enable `Files > Files.ReadWrite.All`
 
-## Nuxeo Configuration
-* log into Nuxeo as an administrator
-* Go to Administration / Cloud Services in the left drawer menu
-* Edit the msgraph service, set the client id and secret, then check enabled
+# Nuxeo Configuration
 
+* Log into Nuxeo as an administrator
+* Go to **Administration > Cloud Services** in the left drawer menu
+* Edit the `msgraph` service, set the **Client ID** and **Client Secret** to the values copied in the preceding steps
+* Check `Enabled`
+* Click **Save**
 
+# Known limitations
 
-## Known limitations
 This plugin is a work in progress.
 
-## About Nuxeo
+# About Nuxeo
+
 [Nuxeo](www.nuxeo.com), developer of the leading Content Services Platform, is reinventing enterprise content management (ECM) and digital asset management (DAM). Nuxeo is fundamentally changing how people work with data and content to realize new value from digital information. Its cloud-native platform has been deployed by large enterprises, mid-sized businesses and government agencies worldwide. Customers like Verizon, Electronic Arts, ABN Amro, and the Department of Defense have used Nuxeo's technology to transform the way they do business. Founded in 2008, the company is based in New York with offices across the United States, Europe, and Asia.
 
 Learn more at www.nuxeo.com.
