@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  nuxeo:
+    image: nuxeo-liveconnect-onedrive-graph:2021.0.0-SNAPSHOT
+    restart: always
+    ports:
+    - "8080:8080"
+    - "8787:8787"
+    environment:
+    - JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787
+    - NUXEO_CLID=${NUXEO_CLID}
+    - NUXEO_PACKAGES=nuxeo-web-ui nuxeo-liveconnect
+    hostname: nuxeo
+    volumes:
+    - "nuxeo_data:/var/lib/nuxeo"
+volumes:
+  nuxeo_data:

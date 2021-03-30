@@ -2,7 +2,8 @@
 
 <component name="org.nuxeo.ecm.liveconnect.msgraph.web.ui.resources.contrib">
 
-  <require>org.nuxeo.web.ui.resources</require>
+  <!-- <require>org.nuxeo.web.ui.resources</require> -->
+  <require>org.nuxeo.web.ui.properties.contrib</require>
 
   <extension target="org.nuxeo.ecm.platform.WebResources" point="resources">
     <resource name="nuxeo-liveconnect-onedrive-graph.html" type="import" shrinkable="false">

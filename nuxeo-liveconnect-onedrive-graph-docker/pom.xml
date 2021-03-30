@@ -1,0 +1,81 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.nuxeo.ecm.liveconnect</groupId>
+    <artifactId>nuxeo-liveconnect-onedrive-graph-parent</artifactId>
+    <version>2021.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>nuxeo-liveconnect-onedrive-graph-docker</artifactId>
+  <name>Nuxeo liveconnect onedrive graph docker</name>
+  <packaging>pom</packaging>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-packages</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.nuxeo.ecm.liveconnect</groupId>
+                  <artifactId>nuxeo-liveconnect-onedrive-graph-package</artifactId>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <activation>
+        <property>
+          <name>!skipDocker</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>dockerfile-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default</id>
+                <goals>
+                  <goal>build</goal>
+                  <goal>tag</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <repository>nuxeo-liveconnect-onedrive-graph</repository>
+              <tag>${project.version}</tag>
+              <pullNewerImage>false</pullNewerImage>
+              <buildArgs>
+                <BASE_IMAGE>docker-private.packages.nuxeo.com/nuxeo/nuxeo:${nuxeo.platform.version}</BASE_IMAGE>
+                <BUILD_TAG>latest</BUILD_TAG>
+                <SCM_REF>built-locally</SCM_REF>
+                <VERSION>${project.version}</VERSION>
+                <CLID>${env.NUXEO_CLID}</CLID>
+              </buildArgs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
