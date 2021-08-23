@@ -18,13 +18,16 @@
  */
 package org.nuxeo.ecm.liveconnect.msgraph;
 
+import com.azure.core.credential.AccessToken;
 import com.google.api.client.auth.oauth2.Credential;
-import com.microsoft.graph.models.extensions.IGraphServiceClient;
-import com.microsoft.graph.models.extensions.User;
-import com.microsoft.graph.requests.extensions.GraphServiceClient;
+import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
+import com.microsoft.graph.models.User;
+import com.microsoft.graph.requests.GraphServiceClient;
+import okhttp3.Request;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.liveconnect.core.AbstractLiveConnectOAuth2ServiceProvider;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -32,22 +35,22 @@ public class MSGraphOAuth2ServiceProvider extends AbstractLiveConnectOAuth2Servi
 
     private static final Log log = LogFactory.getLog(MSGraphOAuth2ServiceProvider.class);
 
-    protected IGraphServiceClient getGraphClient(Credential credential) {
+    protected GraphServiceClient<Request> getGraphClient(Credential credential) {
         String accessToken = credential.getAccessToken();
         return getGraphClient(accessToken);
     }
 
-    protected IGraphServiceClient getGraphClient(String accessToken) {
+    protected GraphServiceClient<Request> getGraphClient(String accessToken) {
+
         return GraphServiceClient.builder()
-                .authenticationProvider(request -> {
-                    request.addHeader("Authorization", "Bearer " + accessToken);
-                })
+                .authenticationProvider(new TokenCredentialAuthProvider(this.getScopes(),
+                        tokenRequestContext -> Mono.just(new AccessToken(accessToken,null))))
                 .buildClient();
     }
 
     @Override
-    protected String getUserEmail(String accessToken) throws IOException {
-        IGraphServiceClient graphClient = getGraphClient(accessToken);
+    protected String getUserEmail(String accessToken) {
+        GraphServiceClient<Request> graphClient = getGraphClient(accessToken);
         User user =  graphClient.me().buildRequest().get();
         return user.userPrincipalName;
     }

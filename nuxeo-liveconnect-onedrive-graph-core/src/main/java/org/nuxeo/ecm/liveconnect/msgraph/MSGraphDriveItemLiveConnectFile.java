@@ -18,7 +18,7 @@
  */
 package org.nuxeo.ecm.liveconnect.msgraph;
 
-import com.microsoft.graph.models.extensions.DriveItem;
+import com.microsoft.graph.models.DriveItem;
 import org.nuxeo.ecm.liveconnect.core.AbstractLiveConnectFile;
 import org.nuxeo.ecm.liveconnect.core.LiveConnectFileInfo;
 

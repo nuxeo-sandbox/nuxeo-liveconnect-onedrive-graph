@@ -7,4 +7,5 @@ Bundle-Name: nuxeo-liveconnect-onedrive-graph-core
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.nuxeo.ecm.liveconnect.nuxeo-liveconnect-onedrive-graph-core;singleton=true
 Nuxeo-Component: OSGI-INF/msgraph-config.xml,
- OSGI-INF/cache-config.xml
+ OSGI-INF/cache-config.xml,
+ OSGI-INF/pageprovider-contrib.xml
