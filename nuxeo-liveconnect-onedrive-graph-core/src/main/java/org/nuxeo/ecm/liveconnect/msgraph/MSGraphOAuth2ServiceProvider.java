@@ -29,8 +29,6 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.liveconnect.core.AbstractLiveConnectOAuth2ServiceProvider;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-
 public class MSGraphOAuth2ServiceProvider extends AbstractLiveConnectOAuth2ServiceProvider {
 
     private static final Log log = LogFactory.getLog(MSGraphOAuth2ServiceProvider.class);

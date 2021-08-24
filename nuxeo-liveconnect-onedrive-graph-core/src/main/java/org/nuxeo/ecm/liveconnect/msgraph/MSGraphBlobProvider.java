@@ -19,7 +19,9 @@
  */
 package org.nuxeo.ecm.liveconnect.msgraph;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.gson.JsonElement;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.models.DriveItem;
 import com.microsoft.graph.models.DriveItemCreateLinkParameterSet;
@@ -73,7 +75,7 @@ public class MSGraphBlobProvider extends AbstractLiveConnectBlobProvider<MSGraph
         switch (usage) {
         case STREAM:
         case DOWNLOAD:
-            url = GetDriveItem(fileInfo).webUrl;
+            url = getDownloadUrl(fileInfo);
             break;
         case VIEW:
             url = getSharableLink(fileInfo,"view");
@@ -181,7 +183,7 @@ public class MSGraphBlobProvider extends AbstractLiveConnectBlobProvider<MSGraph
         return permission.link.webUrl;
     }
 
-    private String getEmbedUrl(LiveConnectFileInfo fileInfo) throws IOException {
+    protected String getEmbedUrl(LiveConnectFileInfo fileInfo) throws IOException {
         GraphServiceClient<Request> graphClient = getGraphClient(fileInfo);
         Drive drive = graphClient.me().drive().buildRequest().get();
         if ("business".equals(drive.driveType)) {
@@ -190,6 +192,13 @@ public class MSGraphBlobProvider extends AbstractLiveConnectBlobProvider<MSGraph
         } else {
             return getSharableLink(fileInfo,"embed");
         }
+    }
+
+    protected String getDownloadUrl(LiveConnectFileInfo fileInfo) throws IOException {
+        GraphServiceClient<Request> graphClient = getGraphClient(fileInfo);
+        DriveItem item = graphClient.me().drive().items(fileInfo.getFileId()).buildRequest().get();
+        JsonElement element =  item.additionalDataManager().get("@microsoft.graph.downloadUrl");
+        return !element.isJsonNull() ? element.getAsString() : null;
     }
 
 }
