@@ -9,7 +9,7 @@
 
   <groupId>org.nuxeo.ecm.liveconnect</groupId>
   <artifactId>nuxeo-liveconnect-onedrive-graph-parent</artifactId>
-  <version>2021.0.1-SNAPSHOT</version>
+  <version>2021.2.0-SNAPSHOT</version>
   <name>Nuxeo liveconnect onedrive graph parent</name>
   <description />
   <packaging>pom</packaging>
