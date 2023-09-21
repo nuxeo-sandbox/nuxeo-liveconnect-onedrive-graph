@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.nuxeo</groupId>
     <artifactId>nuxeo-parent</artifactId>
-    <version>2021.8</version>
+    <version>2021.43</version>
   </parent>
 
   <groupId>org.nuxeo.ecm.liveconnect</groupId>
@@ -90,15 +90,4 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>com.spotify</groupId>
-          <artifactId>dockerfile-maven-plugin</artifactId>
-          <version>1.4.13</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 </project>

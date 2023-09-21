@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.microsoft.graph</groupId>
             <artifactId>microsoft-graph</artifactId>
-            <version>5.0.0</version>
+            <version>5.70.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>jakarta.activation</groupId>

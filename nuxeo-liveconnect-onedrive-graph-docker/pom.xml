@@ -49,28 +49,32 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>dockerfile-maven-plugin</artifactId>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.43.4</version>
             <executions>
               <execution>
-                <id>default</id>
                 <goals>
                   <goal>build</goal>
                   <goal>tag</goal>
+                  <goal>push</goal>
                 </goals>
               </execution>
             </executions>
             <configuration>
-              <repository>nuxeo-liveconnect-onedrive-graph</repository>
-              <tag>${project.version}</tag>
-              <pullNewerImage>false</pullNewerImage>
-              <buildArgs>
-                <BASE_IMAGE>docker-private.packages.nuxeo.com/nuxeo/nuxeo:${nuxeo.platform.version}</BASE_IMAGE>
-                <BUILD_TAG>latest</BUILD_TAG>
-                <SCM_REF>built-locally</SCM_REF>
-                <VERSION>${project.version}</VERSION>
-                <CLID>${env.NUXEO_CLID}</CLID>
-              </buildArgs>
+              <images>
+                <image>
+                  <name>nuxeo-liveconnect-onedrive-graph:${project.version}</name>
+                  <build>
+                    <args>
+                      <BASE_IMAGE>docker-private.packages.nuxeo.com/nuxeo/nuxeo:${nuxeo.platform.version}</BASE_IMAGE>
+                      <BUILD_TAG>${project.version}</BUILD_TAG>
+                      <SCM_REF>built-locally</SCM_REF>
+                    </args>
+                    <contextDir>${project.basedir}</contextDir>
+                  </build>
+                </image>
+              </images>
             </configuration>
           </plugin>
         </plugins>
