@@ -104,10 +104,10 @@ Contributors:
               })
               context.notifyBlobPick(blobs);
             },
+            error: function(error) { console.log(error)},
             advanced: {
               accessToken: token,
-              redirectUri: window.location.origin+window.location.pathname+"nuxeo-liveconnect/nuxeo-liveconnect-onedrive-picker.html",
-              loginHint: "https://graph.microsoft.com/v1.0/"
+              redirectUri: window.location.origin+window.location.pathname+"nuxeo-liveconnect/nuxeo-liveconnect-onedrive-picker.html"
             }
           };
           OneDrive.open(options);
