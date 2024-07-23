@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   nuxeo:
-    image: nuxeo-liveconnect-onedrive-graph:2021.3.0-SNAPSHOT
+    image: nuxeo-liveconnect-onedrive-graph:2023.0.0-SNAPSHOT
     restart: always
     ports:
     - "8080:8080"
