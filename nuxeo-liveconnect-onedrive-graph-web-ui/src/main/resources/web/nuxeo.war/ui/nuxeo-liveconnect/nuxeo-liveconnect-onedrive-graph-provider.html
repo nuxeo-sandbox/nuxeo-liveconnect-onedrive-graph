@@ -88,7 +88,7 @@ Contributors:
           var context = this;
           var options = {
             clientId: this.clientId,
-            action: "download",
+            action: "query",
             success: function (files) {
               console.log(files);
               let blobs = files.value.map(file => {
