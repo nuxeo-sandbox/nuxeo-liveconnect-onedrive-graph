@@ -34,9 +34,9 @@ public class MSGraphDriveItemLiveConnectFile extends AbstractLiveConnectFile {
 
     public MSGraphDriveItemLiveConnectFile(LiveConnectFileInfo info, DriveItem driveItem) {
         super(info);
-        this.filename = driveItem.name;
-        this.fileSize = driveItem.size;
-        this.digest = driveItem.eTag;
+        this.filename = driveItem.getName();
+        this.fileSize = driveItem.getSize().longValue();
+        this.digest = driveItem.getETag();
     }
 
     @Override

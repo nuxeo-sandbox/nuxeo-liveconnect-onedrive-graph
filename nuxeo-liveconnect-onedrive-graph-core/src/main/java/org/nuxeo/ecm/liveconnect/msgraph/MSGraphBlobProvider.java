@@ -19,21 +19,15 @@
  */
 package org.nuxeo.ecm.liveconnect.msgraph;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.gson.JsonElement;
-import com.microsoft.graph.models.Drive;
-import com.microsoft.graph.models.DriveItem;
-import com.microsoft.graph.models.DriveItemCreateLinkParameterSet;
-import com.microsoft.graph.models.DriveItemPreviewParameterSet;
-import com.microsoft.graph.models.ItemPreviewInfo;
-import com.microsoft.graph.models.Permission;
-import com.microsoft.graph.models.ThumbnailSet;
-import com.microsoft.graph.requests.GraphServiceClient;
-import com.microsoft.graph.requests.ThumbnailSetCollectionPage;
-import okhttp3.Request;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.microsoft.graph.drives.item.items.item.DriveItemItemRequestBuilder;
+import com.microsoft.graph.drives.item.items.item.createlink.CreateLinkPostRequestBody;
+import com.microsoft.graph.drives.item.items.item.preview.PreviewPostRequestBody;
+import com.microsoft.graph.models.*;
+import com.microsoft.graph.serviceclient.GraphServiceClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.blob.BlobManager.UsageHint;
 import org.nuxeo.ecm.core.blob.ManagedBlob;
 import org.nuxeo.ecm.core.blob.apps.AppLink;
@@ -44,6 +38,7 @@ import org.nuxeo.ecm.platform.web.common.vh.VirtualHostHelper;
 import org.nuxeo.runtime.api.Framework;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -52,7 +47,7 @@ import java.util.List;
 
 public class MSGraphBlobProvider extends AbstractLiveConnectBlobProvider<MSGraphOAuth2ServiceProvider> {
 
-    private static final Log log = LogFactory.getLog(MSGraphBlobProvider.class);
+    private static final Logger log = LogManager.getLogger(MSGraphBlobProvider.class);
 
     private static final String CACHE_NAME = "msgraph";
 
@@ -91,44 +86,35 @@ public class MSGraphBlobProvider extends AbstractLiveConnectBlobProvider<MSGraph
     }
 
     @Override
-    public InputStream getStream(ManagedBlob blob) throws IOException {
+    public InputStream getStream(ManagedBlob blob) {
         LiveConnectFileInfo fileInfo = toFileInfo(blob);
-        GraphServiceClient<Request> graphServiceClient = getGraphClient(fileInfo);
-        return graphServiceClient.me().drive().items(fileInfo.getFileId()).content().buildRequest().get();
+        GraphServiceClient graphClient = getGraphClient(fileInfo);
+        Drive drive = graphClient.me().drive().get();
+        return getDriveItemRequestBuilder(fileInfo).content().get();
+
     }
 
     @Override
-    public InputStream getThumbnail(ManagedBlob blob) throws IOException {
+    public InputStream getThumbnail(ManagedBlob blob) {
         LiveConnectFileInfo fileInfo = toFileInfo(blob);
-        GraphServiceClient<Request> graphServiceClient = getGraphClient(fileInfo);
-        ThumbnailSetCollectionPage thumbnailSetPage =
-                graphServiceClient.me().drive().items(fileInfo.getFileId()).thumbnails().buildRequest().get();
-
-        if (thumbnailSetPage == null) {
-            return null;
-        }
-
-        List<ThumbnailSet> thumbnailSets = thumbnailSetPage.getCurrentPage();
+        List<ThumbnailSet> thumbnailSets = getDriveItemRequestBuilder(fileInfo).thumbnails().get().getValue();
 
         if (thumbnailSets.isEmpty()) {
             return null;
         } else {
-            String size;
-
+            byte[] content;
             ThumbnailSet thumbnailSet = thumbnailSets.get(0);
 
-            if (thumbnailSet.large != null) {
-                size = "large";
-            } else if (thumbnailSet.medium != null) {
-                size = "medium";
-            } else if (thumbnailSet.small != null) {
-                size = "small";
+            if (thumbnailSet.getLarge() != null) {
+               content = thumbnailSet.getLarge().getContent();
+            } else if (thumbnailSet.getMedium() != null) {
+                content = thumbnailSet.getMedium().getContent();
+            } else if (thumbnailSet.getSmall() != null) {
+                content = thumbnailSet.getSmall().getContent();
             } else {
                 return null;
             }
-
-            return graphServiceClient.me().drive().items(fileInfo.getFileId()).thumbnails("0").
-                    getThumbnailSize(size).content().buildRequest().get();
+            return content != null ? new ByteArrayInputStream(content) : null;
         }
     }
 
@@ -152,53 +138,58 @@ public class MSGraphBlobProvider extends AbstractLiveConnectBlobProvider<MSGraph
         return Collections.singletonList(appLink);
     }
 
-    protected GraphServiceClient<Request> getGraphClient(LiveConnectFileInfo fileInfo) throws IOException {
-        return getGraphClient(getCredential(fileInfo));
+    @Override
+    protected LiveConnectFile retrieveFile(LiveConnectFileInfo fileInfo) throws IOException {
+        return new MSGraphDriveItemLiveConnectFile(fileInfo, getDriveItem(fileInfo));
     }
 
-    protected GraphServiceClient<Request> getGraphClient(Credential credential) {
+
+    protected GraphServiceClient getGraphClient(LiveConnectFileInfo fileInfo) {
+        try {
+            return getGraphClient(getCredential(fileInfo));
+        } catch (IOException e) {
+            throw new NuxeoException(e);
+        }
+    }
+
+    protected GraphServiceClient getGraphClient(Credential credential) {
         return getOAuth2Provider().getGraphClient(credential);
     }
 
-    @Override
-    protected LiveConnectFile retrieveFile(LiveConnectFileInfo fileInfo) throws IOException {
-        return new MSGraphDriveItemLiveConnectFile(fileInfo, retrieveOneDriveFileMetadata(fileInfo));
+    protected DriveItemItemRequestBuilder getDriveItemRequestBuilder(LiveConnectFileInfo fileInfo) {
+        GraphServiceClient graphClient = getGraphClient(fileInfo);
+        Drive drive = graphClient.me().drive().get();
+        return graphClient.drives().byDriveId(drive.getId()).items().byDriveItemId(fileInfo.getFileId());
     }
 
-    protected DriveItem retrieveOneDriveFileMetadata(LiveConnectFileInfo fileInfo) throws IOException {
-        return GetDriveItem(fileInfo);
-    }
-
-    protected DriveItem GetDriveItem(LiveConnectFileInfo fileInfo) throws IOException {
-        GraphServiceClient<Request> graphClient = getGraphClient(fileInfo);
-        return graphClient.me().drive().items(fileInfo.getFileId()).buildRequest().get();
+    protected DriveItem getDriveItem(LiveConnectFileInfo fileInfo) throws IOException {
+        return getDriveItemRequestBuilder(fileInfo).get();
     }
 
     protected String getSharableLink(LiveConnectFileInfo fileInfo, String type) throws IOException {
-        GraphServiceClient<Request> graphClient = getGraphClient(fileInfo);
-        Permission permission = graphClient.me().drive().items(fileInfo.getFileId())
-                .createLink(DriveItemCreateLinkParameterSet.newBuilder().withScope("anonymous").withType(type).build())
-                .buildRequest()
-                .post();
-        return permission.link.webUrl;
+        CreateLinkPostRequestBody createLinkPostRequestBody = new CreateLinkPostRequestBody();
+        createLinkPostRequestBody.setType(type);
+        createLinkPostRequestBody.setScope("anonymous");
+        createLinkPostRequestBody.setRetainInheritedPermissions(false);
+        Permission permission = getDriveItemRequestBuilder(fileInfo).createLink().post(createLinkPostRequestBody);
+        return permission.getLink().getWebUrl();
     }
 
     protected String getEmbedUrl(LiveConnectFileInfo fileInfo) throws IOException {
-        GraphServiceClient<Request> graphClient = getGraphClient(fileInfo);
-        Drive drive = graphClient.me().drive().buildRequest().get();
-        if ("business".equals(drive.driveType)) {
-            ItemPreviewInfo preview = graphClient.me().drive().items(fileInfo.getFileId()).preview(DriveItemPreviewParameterSet.newBuilder().build()).buildRequest().post();
-            return preview.getUrl;
+        GraphServiceClient graphClient = getGraphClient(fileInfo);
+        Drive drive = graphClient.me().drive().get();
+        if ("business".equals(drive.getDriveType())) {
+            PreviewPostRequestBody previewPostRequestBody = new PreviewPostRequestBody();
+            ItemPreviewInfo preview = getDriveItemRequestBuilder(fileInfo).preview().post(previewPostRequestBody);
+            return preview.getGetUrl();
         } else {
             return getSharableLink(fileInfo,"embed");
         }
     }
 
     protected String getDownloadUrl(LiveConnectFileInfo fileInfo) throws IOException {
-        GraphServiceClient<Request> graphClient = getGraphClient(fileInfo);
-        DriveItem item = graphClient.me().drive().items(fileInfo.getFileId()).buildRequest().get();
-        JsonElement element =  item.additionalDataManager().get("@microsoft.graph.downloadUrl");
-        return !element.isJsonNull() ? element.getAsString() : null;
+        DriveItem item = getDriveItem(fileInfo);
+        return (String) item.getAdditionalData().get("@microsoft.graph.downloadUrl");
     }
 
 }
