@@ -42,6 +42,10 @@ mvn clean install
 * Check `Enabled`
 * Click **Save**
 
+# MS Graph API documentation
+
+[here](https://learn.microsoft.com/en-us/graph/api/resources/onedrive?view=graph-rest-1.0)
+
 # Support
 
 **These features are not part of the Nuxeo Production platform.**
