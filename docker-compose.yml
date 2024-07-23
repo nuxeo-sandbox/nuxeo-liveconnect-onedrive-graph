@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   nuxeo:
     image: nuxeo-liveconnect-onedrive-graph:2023.0.0-SNAPSHOT
