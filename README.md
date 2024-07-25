@@ -38,9 +38,17 @@ mvn clean install
 
 * Log into Nuxeo as an administrator
 * Go to **Administration > Cloud Services** in the left drawer menu
-* Edit the `msgraph` service, set the **Client ID** and **Client Secret** to the values copied in the preceding steps
+* Edit the `msgraph` service, set the **Client ID** and **Client Secret** to the values copied in the preceding 
+* Unless your app is multi-tenant, and you are a verified published, replace `/common/` by the tenant ID in the authorization server url and token server url 
 * Check `Enabled`
 * Click **Save**
+
+Unless your app is multi-tenant, and you are a verified published, In nuxeo.conf, set the microsoft tenant name
+```
+nuxeo.liveconnect.msgraph.tenantName=
+```
+
+The tenant name is found in the sharepoint url `https://<tenantName>-my.sharepoint.com/`
 
 # MS Graph API documentation
 
