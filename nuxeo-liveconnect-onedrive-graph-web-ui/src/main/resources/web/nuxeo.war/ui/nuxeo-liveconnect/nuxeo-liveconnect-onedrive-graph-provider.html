@@ -110,6 +110,11 @@ Contributors:
               redirectUri: window.location.origin+window.location.pathname+"nuxeo-liveconnect/nuxeo-liveconnect-onedrive-picker.html"
             }
           };
+
+          if (Nuxeo.UI.config.msgraph?.tenantName) {
+            options.advanced.endpointHint = `https://${Nuxeo.UI.config.msgraph.tenantName}-my.sharepoint.com/`;
+          }
+
           OneDrive.open(options);
         }
       });

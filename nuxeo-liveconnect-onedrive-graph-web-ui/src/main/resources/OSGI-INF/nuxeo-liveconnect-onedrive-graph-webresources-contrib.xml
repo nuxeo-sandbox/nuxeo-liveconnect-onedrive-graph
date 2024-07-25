@@ -19,4 +19,9 @@
     </bundle>
   </extension>
 
+  <extension target="org.nuxeo.runtime.ConfigurationService" point="configuration">
+    <property name="org.nuxeo.web.ui.msgraph.tenantName">${nuxeo.liveconnect.msgraph.tenantName:=}</property>
+  </extension>
+
+
 </component>
