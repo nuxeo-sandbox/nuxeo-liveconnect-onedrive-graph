@@ -32,7 +32,7 @@ import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.liveconnect.core.AbstractLiveConnectOAuth2ServiceProvider;
 import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 public class MSGraphOAuth2ServiceProvider extends AbstractLiveConnectOAuth2ServiceProvider {
