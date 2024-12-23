@@ -11,10 +11,11 @@ name: Update Nuxeo Version
 
 on:
   workflow_dispatch:
-    targetVersion:
-      description: 'The target nuxeo version to apply'
-      required: true
-      type: string
+    inputs:
+      targetVersion:
+        description: 'The target nuxeo version to apply'
+        required: true
+        type: string
 
 jobs:
   build:
@@ -43,7 +44,7 @@ jobs:
             ]
 
       - name: Build with Maven
-        run: mvn versions:update-parent -DparentVersion=${{ inputs.targetVersion }} -DskipResolution=${{ inputs.targetVersion && 'true' || 'false' }}
+        run: mvn versions:update-parent -DparentVersion=${{ inputs.targetVersion }} -DskipResolution=${{ inputs.targetVersion && 'true' || 'false' }} -DgenerateBackupPoms=false
 
       - name: Set up Git configuration
         run: |
@@ -59,4 +60,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: | 
-          git push origin HEAD:main
+          git push origin HEAD:${{ github.ref_name }}
