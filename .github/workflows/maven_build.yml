@@ -7,11 +7,14 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java Build with Maven
+name: Update Nuxeo Version
 
 on:
   workflow_dispatch:
-    branches: [ "*" ]
+    targetVersion:
+      description: 'The target nuxeo version to apply'
+      required: true
+      type: string
 
 jobs:
   build:
@@ -30,10 +33,30 @@ jobs:
       - name: maven-settings-action
         uses: s4u/maven-settings-action@v3.1.0
         with:
-          servers: '[
-            {"id": "maven-private", "username": "${{ secrets.NUXEO_MAVEN_USER }}", "password": "${{ secrets.NUXEO_MAVEN_TOKEN }}"},
-            {"id": "maven-internal", "username": "${{ secrets.NUXEO_MAVEN_USER }}", "password": "${{ secrets.NUXEO_MAVEN_TOKEN }}"}
-          ]'
+          servers: |
+            [
+              {
+                "id": "maven-private",
+                "username": "${{ secrets.NUXEO_MAVEN_USER }}",
+                "password": "${{ secrets.NUXEO_MAVEN_TOKEN }}"
+              }
+            ]
 
       - name: Build with Maven
-        run: mvn -B install --file pom.xml -DskipDocker=true
+        run: mvn versions:update-parent -DparentVersion=${{ inputs.targetVersion }} -DskipResolution=${{ inputs.targetVersion && 'true' || 'false' }}
+
+      - name: Set up Git configuration
+        run: |
+          git config --global user.name "github-actions[bot]" 
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit changes
+        run: | 
+          git add . 
+          git commit -m "Update Nuxeo version to ${{ inputs.targetVersion }}" 
+
+      - name: Push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: | 
+          git push origin HEAD:main
