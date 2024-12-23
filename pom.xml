@@ -15,6 +15,7 @@
     <nuxeo.skip.enforcer>true</nuxeo.skip.enforcer>
     <nuxeo.target.version>2025.*</nuxeo.target.version>
     <skipDocker>true</skipDocker>
+    <pushReleaseChanges>false</pushReleaseChanges>
   </properties>
   <modules>
     <module>nuxeo-liveconnect-onedrive-graph-core</module>
@@ -94,7 +95,15 @@
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <scmReleaseCommitComment>Release @{releaseLabel}</scmReleaseCommitComment>
           <scmDevelopmentCommitComment>Post Release @{releaseLabel}</scmDevelopmentCommitComment>
-          <pushChanges>false</pushChanges>
+          <pushChanges>${pushReleaseChanges}</pushChanges>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>2.18.0</version>
+        <configuration>
+          <ruleSet/>
         </configuration>
       </plugin>
     </plugins>
