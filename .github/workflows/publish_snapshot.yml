@@ -1,3 +1,4 @@
+
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
 
@@ -6,7 +7,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java Build with Maven
+name: Publish SNAPSHOT marketplace package
 
 on:
   workflow_dispatch:
@@ -42,3 +43,12 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B install --file pom.xml -DskipDocker=true
+
+      - name: Copy file
+        run: mkdir staging && cp ${{ vars.MP_TARGET_PATH }} staging/package.zip
+
+      - name: Upload ZIP file
+        run: |
+            curl -u ${{ secrets.CONNECT_USER }}:${{ secrets.CONNECT_TOKEN }} \
+                 -F package=@staging/package.zip \
+                 https://connect.nuxeo.com/nuxeo/site/marketplace/upload?batch=true&orgId=nuxeo-presales-us&restrictedToOrgs=nuxeo-presales-eu
