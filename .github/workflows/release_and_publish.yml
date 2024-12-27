@@ -57,7 +57,7 @@ jobs:
       run: |
         curl -u ${{ secrets.CONNECT_USER }}:${{ secrets.CONNECT_TOKEN }} \
             -F package=@staging/package.zip \
-            https://connect.nuxeo.com/nuxeo/site/marketplace/upload?batch=true&${{ vars.MP_OWNER }}
+            "https://connect.nuxeo.com/nuxeo/site/marketplace/upload?batch=true&supported=false&${{ vars.MP_OWNER }}"
         curl -u ${{ secrets.CONNECT_USER }}:${{ secrets.CONNECT_TOKEN }} \
             -F package=@staging/package.zip \
-            https://nos-preprod-connect.nuxeocloud.com/nuxeo/site/marketplace/upload?batch=true&${{ vars.MP_OWNER }}
+            "https://nos-preprod-connect.nuxeocloud.com/nuxeo/site/marketplace/upload?batch=true&supported=false&${{ vars.MP_OWNER }}"
